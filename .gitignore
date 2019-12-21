@@ -105,13 +105,3 @@ venv.bak/
 /picture
 /.gitignore
 /.vscode
-/idea
-.idea/.gitignore
-.idea/deployment.xml
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/modules.xml
-.idea/other.xml
-.idea/python_study.iml
-.idea/vcs.xml
-.idea/webServers.xml

@@ -103,3 +103,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 !/picture/
+!/2020.txt

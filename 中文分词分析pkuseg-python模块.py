@@ -12,7 +12,7 @@ seg = pkuseg.pkuseg(user_dict=lexicon)  # 加载模型，给定用户词典
 text = seg.cut(content)
 
 stopwords = []
-with open('stopword.txt', encoding='utf-8') as f:
+with open('mystopword.txt', encoding='utf-8') as f:
     stopwords = f.read()
 
 new_text = []
@@ -23,5 +23,3 @@ for w in text:
 # print(new_text)
 counter = Counter(new_text)
 pprint.pprint(counter.most_common(100))
-iter(new_text)
-next(new_text)

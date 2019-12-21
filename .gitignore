@@ -102,13 +102,16 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-!/picture/
-!/2020.txt
-!/.idea/
-!/.idea/vcs.xml
-!/.idea/Self-study.iml
-!/.idea/modules.xml
-!/.idea/misc.xml
-!/.idea/.gitignore
-!/.idea/inspectionProfiles/profiles_settings.xml
-!/.idea/inspectionProfiles/
+/picture
+/.gitignore
+/.vscode
+/idea
+.idea/.gitignore
+.idea/deployment.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/other.xml
+.idea/python_study.iml
+.idea/vcs.xml
+.idea/webServers.xml

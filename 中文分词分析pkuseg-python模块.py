@@ -23,3 +23,5 @@ for w in text:
 # print(new_text)
 counter = Counter(new_text)
 pprint.pprint(counter.most_common(100))
+iter(new_text)
+next(new_text)

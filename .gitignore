@@ -117,3 +117,4 @@ venv.bak/
 .idea/webServers.xml
 .idea/Self-study.iml
 2020.txt
+!/爬虫/

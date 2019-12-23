@@ -117,4 +117,7 @@ venv.bak/
 .idea/webServers.xml
 .idea/Self-study.iml
 2020.txt
-!/爬虫/
+/爬虫
+/爬虫/download_baidutupian.py
+/爬虫/meizitu.py
+/爬虫/meizitu2.py

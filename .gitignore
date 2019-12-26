@@ -121,3 +121,6 @@ venv.bak/
 /爬虫/download_baidutupian.py
 /爬虫/meizitu.py
 /爬虫/meizitu2.py
+/2018.xlsx
+/.idea/dataSources.xml
+/.idea/sqldialects.xml

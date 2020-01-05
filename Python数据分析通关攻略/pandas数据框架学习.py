@@ -59,3 +59,15 @@ dff.iloc[0]
 dff.iloc[:, 0]
 # 这里要区分开来，涉及到位置切片，仍然为左闭右开的规则
 dff.iloc[1, 1:]
+# index对象可以像列表一样被灵活切片,但是index对象是不可以被修改的。
+dff.index[:2]
+# 如果用户希望更改数据集的索引，要么显式的重新定义index（就像上文，显式地更改Series的index）。
+# 要么用reindex的方式，为数据集构造一个新的index对象
+# reindex的方式，会继承原先的索引，如果有新增的索引项，那么会自动填充空值。
+# 也可以增加fill_value属性，自动填充其他值。
+dff.reindex([200, 201, 202, 203], fill_value=1)
+# 列索引的基本格式和行索引一直，也是Pandas自带的Index格式
+dff.columns[:1]
+dff.rename(columns={"A": "col_01", "B": "col_02", "C": "col_03", 'D': 'col_04'})
+dff.columns = ['C', 'D', 'E', 'F']
+dff

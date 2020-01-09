@@ -19,9 +19,9 @@ def demo():
     B.start()
     C.start()
     time.sleep(20)
-    print('进程A%s' % ('还在工作中' if A.isAlive() else '已经结束工作',))
-    print('进程B%s' % ('还在工作中' if B.isAlive() else '已经结束工作',))
-    print('进程C%s' % ('还在工作中' if C.isAlive() else '已经结束工作',))
+    print('进程A%s' % ('还在工作中' if A.is_alive() else '已经结束工作',))
+    print('进程B%s' % ('还在工作中' if B.is_alive() else '已经结束工作',))
+    print('进程C%s' % ('还在工作中' if C.is_alive() else '已经结束工作',))
     print('have a break.')
 
 

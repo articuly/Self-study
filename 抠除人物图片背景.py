@@ -10,3 +10,4 @@ rmbg = RemoveBg("xirBtVjr681jz1VUKBG2B7ZP", "removebgerror.log")
 path = "%s\\picture" % os.getcwd()
 for pic in os.listdir(path):
     rmbg.remove_background_from_img_file("%s\%s" % (path, pic))
+    print("完成'{0}'的抠图".format(pic))

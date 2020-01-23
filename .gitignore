@@ -124,3 +124,5 @@ venv.bak/
 /2018.xlsx
 /.idea/dataSources.xml
 /.idea/sqldialects.xml
+.idea/encodings.xml
+.idea/vagrant.xml

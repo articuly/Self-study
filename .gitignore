@@ -120,8 +120,8 @@ venv.bak/
 /爬虫/meizitu.py
 /爬虫/meizitu2.py
 /2018.xlsx
-/.idea/dataSources.xml
-/.idea/sqldialects.xml
+.idea/dataSources.xml
+.idea/sqldialects.xml
 .idea/encodings.xml
 .idea/vagrant.xml
 

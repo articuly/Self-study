@@ -108,7 +108,6 @@ venv.bak/
 /idea
 .idea/.gitignore
 .idea/deployment.xml
-.idea/inspectionProfiles/
 .idea/misc.xml
 .idea/modules.xml
 .idea/other.xml
@@ -124,4 +123,5 @@ venv.bak/
 .idea/sqldialects.xml
 .idea/encodings.xml
 .idea/vagrant.xml
-
+/.idea/dataSources/
+/.idea/inspectionProfiles/

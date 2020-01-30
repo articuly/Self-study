@@ -125,3 +125,4 @@ venv.bak/
 .idea/vagrant.xml
 /.idea/dataSources/
 /.idea/inspectionProfiles/
+/.ipynb_checkpoints/

@@ -1,6 +1,7 @@
 # coding:utf-8
 import time
 import threading
+from bs4 import BeautifulSoup
 
 E = threading.Event()  # 创建事件
 def work(id):

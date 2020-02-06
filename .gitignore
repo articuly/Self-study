@@ -116,8 +116,8 @@ venv.bak/
 .idea/webServers.xml
 .idea/Self-study.iml
 2020.txt
-/数据挖掘/meizitu.py
-/数据挖掘/meizitu2.py
+/数据采集/meizitu.py
+/数据采集/meizitu2.py
 /2018.xlsx
 .idea/dataSources.xml
 .idea/sqldialects.xml

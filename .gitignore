@@ -105,12 +105,9 @@ venv.bak/
 /picture
 /.gitignore
 /.vscode
-/idea
 办公自动化/2020.txt
 /数据采集/meizitu.py
 /数据采集/meizitu2.py
-
-
 /办公自动化/2018.xlsx
 /办公自动化/testing_result.txt
 /.idea/

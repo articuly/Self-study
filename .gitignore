@@ -112,3 +112,4 @@ venv.bak/
 /办公自动化/testing_result.txt
 /.idea/
 *.csv~
+*.html

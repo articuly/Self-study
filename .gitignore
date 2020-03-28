@@ -111,3 +111,4 @@ venv.bak/
 /办公自动化/2018.xlsx
 /办公自动化/testing_result.txt
 /.idea/
+*.csv~

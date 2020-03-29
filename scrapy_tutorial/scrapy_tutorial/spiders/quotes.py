@@ -11,8 +11,12 @@ class QuotesSpider(scrapy.Spider):
 
     # 处理返回的结果
     def parse(self, response):
-        page = response.url.split('/')[-2]
-        file_name = f'quotes-{page}.html'
-        with open(file_name, 'wb') as f:
-            f.write(response.body)
-        self.log('Saved file {}'.format(file_name))
+        page=response.url.split('/')[-2]
+        filename='quotes-{}.txt'.format(page)
+        with open(filename, 'w') as f:
+            quotes=response.css('.quote')
+            for quote in quotes:
+                text=quote.css('.text::text').extract()[0]
+                author=quote.css('.author::text').extract()[0]
+                tags=quote.css('.tag::text').extract()
+                f.write(f'{text}\t{author}\t{tags}\n')

@@ -1,5 +1,4 @@
 # coding:utf-8
-# 增加血条，敌人，攻击类型，敌人个数
 import random
 
 

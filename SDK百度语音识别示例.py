@@ -142,6 +142,8 @@ for filename in FILENAME_LIST:
 
     if (IS_PY3):
         result_str = str(result_str, 'utf-8')
+    result_str = eval(result_str)
     print(result_str)
-    with open("{0}.txt".format(FILENAME), "w") as of:
-        of.write(result_str)
+    with open("result.txt", "a") as of:
+        of.write(result_str['result'][0])
+        of.write('\n')

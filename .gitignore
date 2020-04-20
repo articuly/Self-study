@@ -105,13 +105,13 @@ venv.bak/
 /picture
 /.gitignore
 /.vscode
-2020.txt
+2020_plan.txt
 /数据采集/meizitu.py
 /数据采集/meizitu2.py
-/2018.xlsx
 /testing_result.txt
 /.idea/
+/output/
 *.csv~
 *.html
-/output/
+*.xlsx
 *.wav

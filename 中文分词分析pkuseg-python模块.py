@@ -4,7 +4,7 @@ from collections import Counter
 import pprint
 
 content = []
-with open('2020.txt', encoding='utf-8') as f:
+with open('result.txt', encoding='gbk') as f:
     content = f.read()
 
 lexicon = ['老顾客', '沉寂顾客', '新购顾客']

@@ -115,3 +115,4 @@ venv.bak/
 *.html
 *.xlsx
 *.wav
+/result.txt

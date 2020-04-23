@@ -1,7 +1,7 @@
 from pydub import AudioSegment
 from pydub.utils import make_chunks
 
-myaudio = AudioSegment.from_file(r"E:\Downloads\mm.wav", "wav")
+myaudio = AudioSegment.from_file(r"E:\Downloads\tax_meeting.wav", "wav")
 chunk_length_ms = 1000 * 60  # 分块的毫秒数
 chunks = make_chunks(myaudio, chunk_length_ms)  # 将文件切割成1秒每块
 

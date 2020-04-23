@@ -81,9 +81,9 @@ def fetch_token():
     if (IS_PY3):
         result_str = result_str.decode()
 
-    print(result_str)
+    # print(result_str)
     result = json.loads(result_str)
-    print(result)
+    # print(result)
     if ('access_token' in result.keys() and 'scope' in result.keys()):
         print(SCOPE)
         if SCOPE and (not SCOPE in result['scope'].split(' ')):  # SCOPE = False 忽略检查

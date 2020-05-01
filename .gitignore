@@ -106,8 +106,6 @@ venv.bak/
 /.gitignore
 /.vscode
 2020_plan.txt
-/数据采集/meizitu.py
-/数据采集/meizitu2.py
 /testing_result.txt
 /.idea/
 /output/

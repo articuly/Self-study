@@ -115,3 +115,4 @@ venv.bak/
 *.wav
 /result.txt
 /xf_result.txt
+!/数据采集/config.json

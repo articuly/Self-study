@@ -37,7 +37,7 @@ if __name__ == '__main__':
     USERNAME, PASSWORD, OLDPASSKEY, NEWPASSKEY = read_config('config.json')
 
     # init
-    browser_path = r'D:\Tools\Chromium\chromedriver.exe'
+    browser_path = r'D:\Browser\Chromium\chromedriver.exe'
     web_url = 'http://articuly.ddns.net:29093'
     d = init_driver(browser_path, web_url)
     sleep(2)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
                 # try to replace old passkey
                 try:
-                    sleep(6)
+                    d.implicitly_wait(10)
                     d.switch_to.frame('trackersPage_iframe')  # 切换到悬浮框架才能生效
                     d.find_element_by_id('trackerUrl').clear()
                     d.find_element_by_id('trackerUrl').send_keys(new_tracker_url)

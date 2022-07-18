@@ -36,8 +36,8 @@ def init_driver(driver_path, is_proxy=False):
 
     # 加header
     options.add_argument('lang=zh-CN,zh,zh-TW,en-US,en')
-    options.add_argument(
-        'user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4105.0 Safari/537.36')
+    options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                         'Chrome/84.0.4105.0 Safari/537.36')
 
     driver = WebDriver(driver_path, options=options)
     # 修改 webdriver 值
@@ -132,7 +132,7 @@ def connect_db(conf, max_retry=10, retry_time=60):
             conn_status = True
             print('connect db success')
             return conn
-        except Exception as e:
+        except Exception:
             count += 1
             print(f'connect db timeout, retry {count} time')
             time.sleep(retry_time)

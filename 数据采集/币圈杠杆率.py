@@ -46,7 +46,7 @@ def init_driver(driver_path, is_proxy=False):
     driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': js})
 
     if is_proxy:
-        # 设置代理的地理与时区
+    # 设置代理的地理与时区
         driver.execute_cdp_cmd('Emulation.setGeolocationOverride', geo)
         driver.execute_cdp_cmd('Emulation.setTimezoneOverride', tz)
     driver.maximize_window()
@@ -62,9 +62,13 @@ def read_config(config_path):
 
 
 def get_timezone_geolocation(ip):
-    url = f'http://ip-api.com/json/{ip}'
-    response = requests.get(url)
-    return response.json()
+    # url = f'http://ip-api.com/json/{ip}'
+    # response = requests.get(url)
+    # return response.json()
+    return {"status": "success", "country": "Japan", "countryCode": "JP", "region": "13", "regionName": "Tokyo",
+            "city": "Heiwajima", "zip": "143-0001", "lat": 35.5819, "lon": 139.7663, "timezone": "Asia/Tokyo",
+            "isp": "The Constant Company", "org": "Vultr Holdings, LLC", "as": "AS20473 The Constant Company, LLC",
+            "query": "149.28.24.220"}
 
 
 def bot_test(driver):
@@ -115,7 +119,7 @@ def bot_test(driver):
     with open('test4.html', 'w', encoding='utf-8') as f:
         f.write(page4)
 
-    driver.close()
+    driver.quit()
 
 
 def vol_replace(string):
@@ -159,9 +163,9 @@ if __name__ == '__main__':
     caps_list = [i.text for i in caps]
     caps_list_val = [int(vol_replace(i)) for i in caps_list]
     # find stable caps
-    stable_market = d.find_elements_by_xpath("//section//div//div//div//div//span[@class='sc-1eb5slv-0 iworPT']")
-    stable_coin_cap = int(vol_replace(stable_market[0].text))
-    stable_trade_vol = int(vol_replace(stable_market[1].text))
+    stable_market = d.find_elements_by_xpath("//section//div//div//div//div//span")
+    stable_coin_cap = int(vol_replace(stable_market[1].text))
+    stable_trade_vol = int(vol_replace(stable_market[5].text))
     # find total cap
     top_info = d.find_elements_by_xpath("//*[@class='cmc-link']")
     total_market_cap = int(float(vol_replace(top_info[2].text)))
@@ -192,23 +196,41 @@ if __name__ == '__main__':
 
     # connect db
     conf = read_config(r"D:\OneDrive - business\python_projects\Self-study\数据采集\config.json")
-    conn = connect_db(conf)
-    cur = conn.cursor()
-    sql_txt = f"insert into top_info values ('{id}', '{date_id}', str_to_date('{collect_dtm}', '%Y-%m-%d %H:%i:%S'), " \
-              f"{total_market_cap}, {stable_coin_cap}, {stable_coin_sample_cap}, {stable_sample}, " \
-              f"{lever}, {sample_lever}, {cryptos}, {exchanges}, {day_vol}, " \
-              f"{stable_trade_vol}, {btc_domi}, {eth_domi}, {coin_ratio}, {fiat_ratio})"
-    # insert data
-    try:
-        cur.execute(sql_txt)
-        conn.commit()
-        print('insert data into db successfully')
-    except Exception as e:
-        print(str(e))
-        conn.rollback()
-        print('failed to insert data into db')
-    finally:
-        cur.close()
-        conn.close()
-        d.close()
-        exit()
+    count = 0
+    conn_status = False
+    while count <= 10 and not conn_status:
+        try:
+            conn = pymysql.connect(host=conf['mydb_url'], port=conf['mydb_port'], user=conf['mydb_user'],
+                                   passwd=conf['mydb_pw'], db='blockchain', charset='utf8')
+            conn_status = True
+            print('connect db success')
+            cur = conn.cursor()
+            sql_txt = f"insert into top_info values ('{id}', '{date_id}', str_to_date('{collect_dtm}', '%Y-%m-%d %H:%i:%S'), " \
+                      f"{total_market_cap}, {stable_coin_cap}, {stable_coin_sample_cap}, {stable_sample}, " \
+                      f"{lever}, {sample_lever}, {cryptos}, {exchanges}, {day_vol}, " \
+                      f"{stable_trade_vol}, {btc_domi}, {eth_domi}, {coin_ratio}, {fiat_ratio})"
+            # insert data
+            try:
+                cur.execute(sql_txt)
+                conn.commit()
+                print('insert data into db successfully')
+            except Exception as e:
+                print(str(e))
+                conn.rollback()
+                print('failed to insert data into db')
+            finally:
+                cur.close()
+                conn.close()
+                d.quit()
+                exit()
+
+        except Exception:
+            count += 1
+            print(f'connect db timeout, retry {count} time')
+            time.sleep(60)
+        continue
+
+    d.close()
+    d.quit()
+    print('out of retry times')
+    exit()

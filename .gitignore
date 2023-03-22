@@ -116,3 +116,5 @@ venv.bak/
 /result.txt
 /xf_result.txt
 /数据采集/config.json
+/数据采集/baidu_cookie.txt
+/数据采集/baidu_index.png

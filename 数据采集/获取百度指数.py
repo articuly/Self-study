@@ -151,7 +151,7 @@ class DownloadBaiDuIndex:
         if len(self.date_list) == len(self.num_list):
             self.df = pd.DataFrame({'date': self.date_list,
                                     'num': [int(i) for i in self.num_list]})
-            plt.figure(figsize=(9, 6))
+            plt.figure(figsize=(9, 5))
             plt.plot(self.df['date'], self.df['num'])
             plt.xlabel('date')
             plt.ylabel('indexes')
@@ -186,7 +186,7 @@ class DownloadBaiDuIndex:
                     <td>最大值：{max}</td><td>最小值：{min}</td><td>极差：{s_range}</td>
                 </tr>
                 <tr>
-                    <td>平均值：{mean}</td><td>标准差：{std}</td><td>天数：{count}</td>
+                    <td>平均值：{mean}</td><td>标准差：{std}</td><td>昨天较前天变化：{count}</td>
                 </tr>
                 <tr>
                     <td>25%分位数：{p25}</td><td>50%分位数：{p50}</td><td>75%分位数：{p75}</td>
@@ -195,10 +195,13 @@ class DownloadBaiDuIndex:
             </table>
             <p><br><img src="cid:image1"></br></p>
             '''
+            s_range = self.df['num'].max() - self.df['num'].min()
+            df_len = self.df.shape[0]
+            diff = (self.df.loc[df_len - 1, 'num'] - self.df.loc[df_len - 2, 'num']) / self.df.loc[df_len - 2, 'num']
             mail_body = MIMEText(body.format(word=self.keyword, max=self.df['num'].max(), min=self.df['num'].min(),
-                                             s_range=(self.df['num'].max() - self.df['num'].min()),
-                                             mean=round(self.df['num'].mean(), 2), std=round(self.df['num'].std(), 2),
-                                             count=self.df['num'].count(), p25=round(self.df['num'].quantile(0.25), 2),
+                                             s_range=s_range, mean=round(self.df['num'].mean(), 2),
+                                             std=round(self.df['num'].std(), 2), count=str(round(diff, 2) * 100) + '%',
+                                             p25=round(self.df['num'].quantile(0.25), 2),
                                              p50=round(self.df['num'].quantile(0.5), 2),
                                              p75=round(self.df['num'].quantile(0.75), 2)),
                                  _subtype='html', _charset='utf-8')
@@ -232,6 +235,6 @@ if __name__ == '__main__':
     d.get_index()
     d.send_mail(config_name='config.json')
 
-    d.driver.close()
-    d.driver.quit()
-    exit()
+    # d.driver.close()
+    # d.driver.quit()
+    # exit()

@@ -5,7 +5,7 @@ import json
 import gzip
 import zlib
 import brotli
-from datetime import datetime
+from datetime import datetime, timedelta
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.chrome.service import Service
@@ -19,17 +19,19 @@ import smtplib
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import gopup as gp
+from Util import read_json
 
 
 class DownloadBaiDuIndex:
     current_dir = os.path.abspath(__file__).rsplit('\\', 1)[0]
 
-    def __init__(self, driver_dir):
+    def __init__(self, driver_dir, config_name):
         self.driver_dir = driver_dir
+        self.paras = read_json(os.path.join(DownloadBaiDuIndex.current_dir, config_name))
         self.keyword = ''
         self.ptbk = None
         self.data = None
-        self.paras = {}
         self.start_date = ''
         self.end_date = ''
         self.results = ''
@@ -87,13 +89,27 @@ class DownloadBaiDuIndex:
         self.driver.get('https://index.baidu.com/v2/index.html')
         print('已读取cookie，自动完成登陆')
 
-    @staticmethod
-    def read_config(config_name):
-        f = open(os.path.join(DownloadBaiDuIndex.current_dir, config_name), 'r')
-        txt = f.read()
-        f.close()
-        paras = json.loads(txt)
-        return paras
+    def gopup_baidu_index(self, word, start_date, end_date, dtype='all'):
+        self.keyword = word
+        self.start_date = start_date
+        self.end_date = end_date
+        cookie = self.paras['baidu_cookie']
+        if not cookie:
+            print('读取百度cookie成功，可以获取数据')
+            dtype = dtype
+            self.df = gp.baidu_search_index(word=self.keyword, start_date=self.start_date, end_date=self.end_date,
+                                            cookie=cookie, type=dtype)
+
+            self.df['num'] = pd.to_numeric(self.df['index'])
+            self.df.reset_index(inplace=True)
+            self.df.drop(['keyword', 'type', 'index'], axis=1, inplace=True)
+
+            plt.figure(figsize=(12, 5))
+            plt.plot(self.df['date'], self.df['num'])
+            plt.xlabel('date')
+            plt.ylabel('indexes')
+            plt.savefig(os.path.join(DownloadBaiDuIndex.current_dir, 'baidu_index.png'), facecolor='w')
+            plt.close()
 
     def enter_keyword(self, keyword):
         self.keyword = keyword
@@ -160,8 +176,7 @@ class DownloadBaiDuIndex:
         else:
             print('日期长度与数据长度不一致，请检查')
 
-    def send_mail(self, config_name):
-        self.paras = self.read_config(config_name)
+    def send_mail(self):
         sender = self.paras['mail_sender']
         passwd = self.paras['mail_password']
         receiver = self.paras['mail_receiver']
@@ -228,12 +243,14 @@ class DownloadBaiDuIndex:
 
 
 if __name__ == '__main__':
-    d = DownloadBaiDuIndex(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
+    d = DownloadBaiDuIndex(driver_dir=r'D:\Browser\Chromium\chromedriver.exe', config_name='config.json')
     # d.get_cookie()
-    d.load_cookies()
-    d.enter_keyword(keyword='疫情')
-    d.get_index()
-    d.send_mail(config_name='config.json')
+    # d.load_cookies()
+    # d.enter_keyword(keyword='疫情')
+    # d.get_index()
+    yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    d.gopup_baidu_index('疫情', start_date='2022-10-01', end_date=yesterday_str)
+    d.send_mail()
 
     # d.driver.close()
     # d.driver.quit()

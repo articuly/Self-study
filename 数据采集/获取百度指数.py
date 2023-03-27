@@ -26,8 +26,7 @@ from Util import read_json
 class DownloadBaiDuIndex:
     current_dir = os.path.abspath(__file__).rsplit('\\', 1)[0]
 
-    def __init__(self, driver_dir, config_name):
-        self.driver_dir = driver_dir
+    def __init__(self, config_name):
         self.paras = read_json(os.path.join(DownloadBaiDuIndex.current_dir, config_name))
         self.keyword = ''
         self.ptbk = None
@@ -38,7 +37,12 @@ class DownloadBaiDuIndex:
         self.num_list = []
         self.date_list = None
         self.df = None
+        self.driver_dir = ''
+        self.driver = None
+        self.options = None
 
+    def build_diver(self, driver_dir):
+        self.driver_dir = driver_dir
         self.options = webdriver.ChromeOptions()
         # 无头模式
         # options.add_argument('--headless')
@@ -93,8 +97,9 @@ class DownloadBaiDuIndex:
         self.keyword = word
         self.start_date = start_date
         self.end_date = end_date
+        # 需要在百度指数网页找到getFeedIndex?area文件
         cookie = self.paras['baidu_cookie']
-        if not cookie:
+        if cookie:
             print('读取百度cookie成功，可以获取数据')
             dtype = dtype
             self.df = gp.baidu_search_index(word=self.keyword, start_date=self.start_date, end_date=self.end_date,
@@ -243,7 +248,8 @@ class DownloadBaiDuIndex:
 
 
 if __name__ == '__main__':
-    d = DownloadBaiDuIndex(driver_dir=r'D:\Browser\Chromium\chromedriver.exe', config_name='config.json')
+    d = DownloadBaiDuIndex(config_name='config.json')
+    # d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
     # d.get_cookie()
     # d.load_cookies()
     # d.enter_keyword(keyword='疫情')

@@ -20,13 +20,14 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import gopup as gp
-from Util import read_json
+from Util import read_json, build_logger
+import logging
 
 
 class DownloadBaiDuIndex:
     current_dir = os.path.abspath(__file__).rsplit('\\', 1)[0]
 
-    def __init__(self, config_name):
+    def __init__(self, config_name, log_name):
         self.paras = read_json(os.path.join(DownloadBaiDuIndex.current_dir, config_name))
         self.keyword = ''
         self.ptbk = None
@@ -40,6 +41,9 @@ class DownloadBaiDuIndex:
         self.driver_dir = ''
         self.driver = None
         self.options = None
+        self.log_name = log_name
+        self.log_path = os.path.join(DownloadBaiDuIndex.current_dir, self.log_name)
+        self.log = build_logger(self.log_path, logging.DEBUG, logging.DEBUG)
 
     def build_diver(self, driver_dir):
         self.driver_dir = driver_dir
@@ -64,24 +68,25 @@ class DownloadBaiDuIndex:
         with open(os.path.join(DownloadBaiDuIndex.current_dir, 'stealth.min.js'), 'r') as f:
             js = f.read()
         self.driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {'source': js})
+        self.log.debug('完成Selenium浏览器的初始化')
 
     def get_cookie(self):
         browser = WebDriver(service=Service(self.driver_dir), options=self.options)
         browser.get("https://index.baidu.com/v2/index.html")
         browser.find_element(By.CSS_SELECTOR, "span.username-text").click()
 
-        print('等待登录...')
+        self.log.debug('等待登录...')
         while True:
             if browser.find_element(By.CSS_SELECTOR, "span.username-text").text != "登录":
                 break
             else:
                 time.sleep(3)
 
-        print('已登录，现在为您保存cookie...')
+        self.log.debug('已登录，现在为您保存cookie...')
         with open(os.path.join(DownloadBaiDuIndex.current_dir, 'baidu_cookie.txt'), 'w', encoding='utf-8') as f:
             json.dump(browser.get_cookies(), f)
 
-        print('cookie保存完成，游览器已自动退出...')
+        self.log.debug('cookie保存完成，游览器已自动退出...')
         browser.close()
 
     def load_cookies(self):
@@ -91,7 +96,7 @@ class DownloadBaiDuIndex:
         for cookie in cookies:
             self.driver.add_cookie(cookie)
         self.driver.get('https://index.baidu.com/v2/index.html')
-        print('已读取cookie，自动完成登陆')
+        self.log.debug('已读取cookie，自动完成登陆')
 
     def gopup_baidu_index(self, word, start_date, end_date, dtype='all'):
         self.keyword = word
@@ -100,7 +105,7 @@ class DownloadBaiDuIndex:
         # 需要在百度指数网页找到getFeedIndex?area文件
         cookie = self.paras['baidu_cookie']
         if cookie:
-            print('读取百度cookie成功，可以获取数据')
+            self.log.debug('读取百度cookie成功，正在通过GoPup获取数据')
             dtype = dtype
             self.df = gp.baidu_search_index(word=self.keyword, start_date=self.start_date, end_date=self.end_date,
                                             cookie=cookie, type=dtype)
@@ -109,25 +114,26 @@ class DownloadBaiDuIndex:
             self.df.reset_index(inplace=True)
             self.df.drop(['keyword', 'type', 'index'], axis=1, inplace=True)
 
-            plt.figure(figsize=(12, 5))
+            plt.figure(figsize=(10, 5))
             plt.plot(self.df['date'], self.df['num'])
             plt.xlabel('date')
             plt.ylabel('indexes')
             plt.savefig(os.path.join(DownloadBaiDuIndex.current_dir, 'baidu_index.png'), facecolor='w')
             plt.close()
+            self.log.debug('画图成功')
 
     def enter_keyword(self, keyword):
         self.keyword = keyword
         wait = WebDriverWait(self.driver, 30)
         edit = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#search-input-form > input.search-input')))
-        print("清空前历史记录数：", len(self.driver.requests))
+        self.log.debug("清空前历史记录数：", len(self.driver.requests))
         del self.driver.requests  # 清空历史数据
         edit.send_keys(Keys.CONTROL + 'a')
         edit.send_keys(Keys.DELETE)
         edit.send_keys(self.keyword)
         submit = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'span.search-input-cancle')))
         submit.click()
-        print("清空后再执行搜索后的历史记录数：", len(self.driver.requests))
+        self.log.debug("清空后再执行搜索后的历史记录数：", len(self.driver.requests))
 
     @staticmethod
     def decompress(res):
@@ -178,8 +184,9 @@ class DownloadBaiDuIndex:
             plt.ylabel('indexes')
             plt.savefig(os.path.join(DownloadBaiDuIndex.current_dir, 'baidu_index.png'))
             plt.close()
+            self.log.debug('画图成功')
         else:
-            print('日期长度与数据长度不一致，请检查')
+            self.log.error('日期长度与数据长度不一致，请检查')
 
     def send_mail(self):
         sender = self.paras['mail_sender']
@@ -189,13 +196,12 @@ class DownloadBaiDuIndex:
         smtp_port = self.paras['smtp_port']
         mail_server = smtplib.SMTP(host=smtp_server, port=smtp_port)
         mail_server.starttls()
-        is_login = False
         try:
             mail_server.login(sender, passwd)
-            is_login = True
         except Exception as e:
-            print(str(e))
-        if is_login:
+            self.log.error(str(e))
+        else:
+            self.log.debug('登陆邮箱成功')
             msg = MIMEMultipart()
             body = '''<h3>你好</h3>
             <p>这是最近一个月百度{word}的搜索指数</p>
@@ -244,11 +250,11 @@ class DownloadBaiDuIndex:
             mail_server.login(sender, passwd)
             mail_server.sendmail(sender, receiver.split(','), msg.as_string())
             mail_server.quit()
-            print('发送成功！')
+            self.log.debug('发送成功！')
 
 
 if __name__ == '__main__':
-    d = DownloadBaiDuIndex(config_name='config.json')
+    d = DownloadBaiDuIndex(config_name='config.json', log_name='get_baidu_index.log')
     # d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
     # d.get_cookie()
     # d.load_cookies()

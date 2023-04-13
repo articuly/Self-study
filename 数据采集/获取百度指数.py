@@ -27,9 +27,9 @@ from Util import read_json, build_logger
 
 
 class DownloadBaiDuIndex:
-    current_dir = os.path.abspath(__file__).rsplit('\\', 1)[0]
+    current_dir: str = os.path.abspath(__file__).rsplit('\\', 1)[0]
 
-    def __init__(self, config_name, log_name):
+    def __init__(self, config_name: str, log_name: str):
         self.paras = read_json(os.path.join(DownloadBaiDuIndex.current_dir, config_name))
         self.keyword = ''
         self.ptbk = None
@@ -47,7 +47,7 @@ class DownloadBaiDuIndex:
         self.log_path = os.path.join(DownloadBaiDuIndex.current_dir, self.log_name)
         self.log = build_logger(self.log_path, logging.DEBUG, logging.DEBUG)
 
-    def build_diver(self, driver_dir):
+    def build_diver(self, driver_dir: str):
         self.driver_dir = driver_dir
         self.options = webdriver.ChromeOptions()
         # 无头模式
@@ -100,7 +100,7 @@ class DownloadBaiDuIndex:
         self.driver.get('https://index.baidu.com/v2/index.html')
         self.log.debug('已读取cookie，自动完成登陆')
 
-    def gopup_baidu_index(self, word, start_date, end_date, dtype='all'):
+    def gopup_baidu_index(self, word: str, start_date: str, end_date: str, dtype: str = 'all'):
         self.keyword = word
         self.start_date = start_date
         self.end_date = end_date
@@ -124,7 +124,7 @@ class DownloadBaiDuIndex:
             plt.close()
             self.log.debug('画图成功')
 
-    def enter_keyword(self, keyword):
+    def enter_keyword(self, keyword: str):
         self.keyword = keyword
         wait = WebDriverWait(self.driver, 30)
         edit = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#search-input-form > input.search-input')))
@@ -138,7 +138,7 @@ class DownloadBaiDuIndex:
         self.log.debug("清空后再执行搜索后的历史记录数：", len(self.driver.requests))
 
     @staticmethod
-    def decompress(res):
+    def decompress(res: json):
         content_encoding = res.headers["content-encoding"]
         if content_encoding == 'gzip':
             res.body = gzip.decompress(res.body)
@@ -148,12 +148,12 @@ class DownloadBaiDuIndex:
             res.body = brotli.decompress(res.body)
 
     @staticmethod
-    def decrypt(ptbk, index_data):
+    def decrypt(ptbk: str, index_data: str) -> str:
         n = len(ptbk) // 2
         a = dict(zip(ptbk[:n], ptbk[n:]))
         return ''.join([a[s] for s in index_data])
 
-    def fetch_data(self, rule, encoding="utf-8", is_json=True):
+    def fetch_data(self, rule: str, encoding: str = "utf-8", is_json: bool = True) -> dict:
         for request in reversed(self.driver.requests):
             if rule in request.url:
                 res = request.response
@@ -259,15 +259,17 @@ class DownloadBaiDuIndex:
 
 if __name__ == '__main__':
     d = DownloadBaiDuIndex(config_name='config.json', log_name='get_baidu_index.log')
-    # d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
-    # d.get_cookie()
-    # d.load_cookies()
-    # d.enter_keyword(keyword='疫情')
-    # d.get_index()
-    yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
-    d.send_mail()
 
-    # d.driver.close()
-    # d.driver.quit()
-    # exit()
+    d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
+    # d.get_cookie()
+    d.load_cookies()
+    d.enter_keyword(keyword='疫情')
+    d.get_index()
+    d.driver.close()
+    d.driver.quit()
+
+    # yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    # d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
+
+    d.send_mail()
+    exit()

@@ -1,10 +1,11 @@
 # coding:utf-8
-import logging
 import json
+import logging
+
 import requests
 
 
-def build_logger(log_path, file_level=logging.DEBUG, console_level=logging.DEBUG):
+def build_logger(log_path: str, file_level: int = logging.DEBUG, console_level: int = logging.DEBUG) -> logging:
     # init_logger
     logger = logging.getLogger(__file__)
     logger.setLevel(logging.DEBUG)
@@ -26,7 +27,7 @@ def build_logger(log_path, file_level=logging.DEBUG, console_level=logging.DEBUG
     return logger
 
 
-def plogger(content, logger):
+def plogger(content: str, logger: logging):
     # log info or print info
     if logger:
         logger.info(content)
@@ -34,7 +35,7 @@ def plogger(content, logger):
         print(content)
 
 
-def read_json(path):
+def read_json(path: str) -> dict:
     # read config from json file
     f = open(path, 'r', encoding='utf-8')
     txt = f.read()
@@ -43,7 +44,7 @@ def read_json(path):
     return params
 
 
-def write_json(path, dictionary):
+def write_json(path: str, dictionary: dict):
     # write dict to json file
     json_txt = json.dumps(dictionary)
     f = open(path, 'w', encoding='utf-8')
@@ -51,7 +52,7 @@ def write_json(path, dictionary):
     f.close()
 
 
-def get_timezone_geolocation(ip):
+def get_timezone_geolocation(ip: str) -> dict:
     # get ip geo info
     try:
         geotz_url = f'http://ip-api.com/json/{ip}'

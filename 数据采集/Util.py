@@ -10,7 +10,7 @@ def build_logger(log_path, file_level=logging.DEBUG, console_level=logging.DEBUG
     logger.setLevel(logging.DEBUG)
 
     # set two handlers
-    file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
+    file_handler = logging.FileHandler(log_path, mode='a', encoding='utf-8')
     file_handler.setLevel(file_level)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(console_level)

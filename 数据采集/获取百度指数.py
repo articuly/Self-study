@@ -1,27 +1,29 @@
 # coding:utf-8
-import time
-import os
-import json
 import gzip
-import zlib
-import brotli
-from datetime import datetime, timedelta
-from seleniumwire import webdriver
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-import pandas as pd
-import matplotlib.pyplot as plt
+import json
+import logging
+import os
 import smtplib
+import time
+import zlib
+from datetime import datetime, timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
+import brotli
 import gopup as gp
+import matplotlib.pyplot as plt
+import pandas as pd
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from seleniumwire import webdriver
+
 from Util import read_json, build_logger
-import logging
 
 
 class DownloadBaiDuIndex:
@@ -204,15 +206,16 @@ class DownloadBaiDuIndex:
             self.log.debug('登陆邮箱成功')
             msg = MIMEMultipart()
             body = '''<h3>你好</h3>
-            <p>这是最近一个月百度{word}的搜索指数</p>
+            <p>这是最近几个月百度{word}的搜索指数</p>
             <p>邮件通过Python脚本生成，仅供参考</p>
+            <p>昨日指数为：{idx}</p>
             <table border="1">
             <tbody>
                 <tr>
                     <td>最大值：{max}</td><td>最小值：{min}</td><td>极差：{s_range}</td>
                 </tr>
                 <tr>
-                    <td>平均值：{mean}</td><td>标准差：{std}</td><td>昨天较前天变化：{count}</td>
+                    <td>平均值：{mean}</td><td>标准差：{std}</td><td>昨天较前天变化：{delta}</td>
                 </tr>
                 <tr>
                     <td>25%分位数：{p25}</td><td>50%分位数：{p50}</td><td>75%分位数：{p75}</td>
@@ -224,13 +227,14 @@ class DownloadBaiDuIndex:
             s_range = self.df['num'].max() - self.df['num'].min()
             df_len = self.df.shape[0]
             diff = (self.df.loc[df_len - 1, 'num'] - self.df.loc[df_len - 2, 'num']) / self.df.loc[df_len - 2, 'num']
-            mail_body = MIMEText(body.format(word=self.keyword, max=self.df['num'].max(), min=self.df['num'].min(),
-                                             s_range=s_range, mean=round(self.df['num'].mean(), 2),
-                                             std=round(self.df['num'].std(), 2), count=str(round(diff, 2) * 100) + '%',
-                                             p25=round(self.df['num'].quantile(0.25), 2),
-                                             p50=round(self.df['num'].quantile(0.5), 2),
-                                             p75=round(self.df['num'].quantile(0.75), 2)),
-                                 _subtype='html', _charset='utf-8')
+            mail_body = MIMEText(
+                body.format(word=self.keyword, idx=self.df.loc[df_len - 1, 'num'], max=self.df['num'].max(),
+                            min=self.df['num'].min(), s_range=s_range, mean=round(self.df['num'].mean(), 2),
+                            std=round(self.df['num'].std(), 2), delta=str(round(diff, 2) * 100) + '%',
+                            p25=round(self.df['num'].quantile(0.25), 2),
+                            p50=round(self.df['num'].quantile(0.5), 2),
+                            p75=round(self.df['num'].quantile(0.75), 2)),
+                _subtype='html', _charset='utf-8')
             msg.attach(mail_body)
 
             fp = open("baidu_index.png", 'rb')
@@ -261,7 +265,7 @@ if __name__ == '__main__':
     # d.enter_keyword(keyword='疫情')
     # d.get_index()
     yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    d.gopup_baidu_index('疫情', start_date='2022-10-01', end_date=yesterday_str)
+    d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
     d.send_mail()
 
     # d.driver.close()

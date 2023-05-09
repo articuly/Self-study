@@ -260,16 +260,16 @@ class DownloadBaiDuIndex:
 if __name__ == '__main__':
     d = DownloadBaiDuIndex(config_name='config.json', log_name='get_baidu_index.log')
 
-    d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
+    # d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
     # d.get_cookie()
-    d.load_cookies()
-    d.enter_keyword(keyword='疫情')
-    d.get_index()
-    d.driver.close()
-    d.driver.quit()
+    # d.load_cookies()
+    # d.enter_keyword(keyword='疫情')
+    # d.get_index()
+    # d.driver.close()
+    # d.driver.quit()
 
-    # yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    # d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
+    yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
 
     d.send_mail()
     exit()

@@ -118,3 +118,10 @@ venv.bak/
 /数据采集/config.json
 /数据采集/baidu_cookie.txt
 /数据采集/baidu_index.png
+数据采集/config-BDNODE0.json
+数据采集/web_chatgpt_cookie.txt
+数据采集/web_chatgpt_temp.txt
+数据采集/*.png
+*.txt
+!*.py
+SDK*

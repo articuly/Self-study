@@ -20,7 +20,7 @@ def init_driver(driver_path, is_proxy=False):
 
     if is_proxy:
         # 加socks5代理
-        options.add_argument('proxy-server=socks5://127.0.0.1:63')
+        options.add_argument('proxy-server=socks5://127.0.0.1:10808')
         # 关闭webrtc
         preferences = {
             'webrtc.ip_handling_policy': 'disable_non_proxied_udp',

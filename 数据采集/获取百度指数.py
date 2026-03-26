@@ -5,6 +5,7 @@ import logging
 import os
 import smtplib
 import time
+import random
 import zlib
 from datetime import datetime, timedelta
 from email.mime.image import MIMEImage
@@ -12,7 +13,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import brotli
-import gopup as gp
+# import gopup as gp
+from qdata.baidu_index import get_search_index
 import matplotlib.pyplot as plt
 import pandas as pd
 from selenium.webdriver.chrome.service import Service
@@ -100,24 +102,31 @@ class DownloadBaiDuIndex:
         self.driver.get('https://index.baidu.com/v2/index.html')
         self.log.debug('已读取cookie，自动完成登陆')
 
-    def gopup_baidu_index(self, word: str, start_date: str, end_date: str, dtype: str = 'all'):
+    def qdata_baidu_index(self, word: str, start_date: str, end_date: str, dtype: str = 'all'):
         self.keyword = word
         self.start_date = start_date
         self.end_date = end_date
         # 需要在百度指数网页找到getFeedIndex?area文件
         cookie = self.paras['baidu_cookie']
         if cookie:
-            self.log.debug('读取百度cookie成功，正在通过GoPup获取数据')
-            dtype = dtype
-            self.df = gp.baidu_search_index(word=self.keyword, start_date=self.start_date, end_date=self.end_date,
-                                            cookie=cookie, type=dtype)
+            self.log.debug('读取百度cookie成功，正在通过Qdata获取数据')
 
+            # self.df = gp.baidu_search_index(word=self.keyword, start_date=self.start_date, end_date=self.end_date,
+            #                                 cookie=cookie, type=dtype)
+
+            # change to qdata package
+            pre_df = get_search_index(keywords_list=[[self.keyword]], start_date=self.start_date,
+                                      end_date=self.end_date, cookies=cookie)
+            self.df = pd.DataFrame(list(pre_df))
+            self.df = self.df[self.df['type'] == dtype]
             self.df['num'] = pd.to_numeric(self.df['index'])
+            self.df['dtm'] = pd.to_datetime(self.df['date'])
             self.df.reset_index(inplace=True)
-            self.df.drop(['keyword', 'type', 'index'], axis=1, inplace=True)
+            # self.df.drop(['keyword', 'type', 'index'], axis=1, inplace=True)
+            self.df.drop(['keyword', 'type', 'index', 'date', 'level_0'], axis=1, inplace=True)
 
             plt.figure(figsize=(10, 5))
-            plt.plot(self.df['date'], self.df['num'])
+            plt.plot(self.df['dtm'], self.df['num'])
             plt.xlabel('date')
             plt.ylabel('indexes')
             plt.savefig(os.path.join(DownloadBaiDuIndex.current_dir, 'baidu_index.png'), facecolor='w')
@@ -254,7 +263,7 @@ class DownloadBaiDuIndex:
             mail_server.login(sender, passwd)
             mail_server.sendmail(sender, receiver.split(','), msg.as_string())
             mail_server.quit()
-            self.log.debug('发送成功！')
+            self.log.debug(f'“{self.keyword}”的指数发送成功！')
 
 
 if __name__ == '__main__':
@@ -263,13 +272,16 @@ if __name__ == '__main__':
     # d.build_diver(driver_dir=r'D:\Browser\Chromium\chromedriver.exe')
     # d.get_cookie()
     # d.load_cookies()
-    # d.enter_keyword(keyword='疫情')
+    # d.enter_keyword(keyword='发烧')
     # d.get_index()
     # d.driver.close()
     # d.driver.quit()
 
     yesterday_str = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-    d.gopup_baidu_index('疫情', start_date='2023-01-01', end_date=yesterday_str)
-
+    d.qdata_baidu_index('发烧', start_date='2023-01-01', end_date=yesterday_str)
     d.send_mail()
+    # time.sleep(random.randint(60,120))
+    # d.qdata_baidu_index('厦门旅游', start_date='2023-01-01', end_date=yesterday_str)
+    # d.send_mail()
+
     exit()
